@@ -1,49 +1,55 @@
 package ua.zloydi.webviewtest
 
-import android.net.Uri
+import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
+import android.os.Build
 import android.os.Bundle
-import android.os.PersistableBundle
+import android.provider.MediaStore
 import android.util.Log
-import android.webkit.ValueCallback
-import android.webkit.WebChromeClient
-import android.webkit.WebSettings
-import android.webkit.WebView
+import android.widget.Button
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var webView: WebView
+    val SELECT_PHOTO = 1
+    private lateinit var imageView: ImageView
+    private lateinit var chooseButton: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        webView = findViewById(R.id.webview)
-        webView.apply {
-            settings.cacheMode = WebSettings.LOAD_DEFAULT
-            settings.javaScriptEnabled = true
-            settings.allowFileAccess = true
-            webChromeClient = this@MainActivity.webChromeClient
-            loadUrl("https://jpg2pdf.com/")
+
+        imageView = findViewById(R.id.imageView)
+        chooseButton = findViewById(R.id.chooseButton)
+
+        chooseButton.setOnClickListener {
+            chooseFile()
         }
     }
 
-    private val webChromeClient = object :  WebChromeClient(){
-        override fun onShowFileChooser(
-            webView: WebView?,
-            filePathCallback: ValueCallback<Array<Uri>>?,
-            fileChooserParams: FileChooserParams?
-        ): Boolean {
-            Log.d("File choose","You wan't choose file")
-            return super.onShowFileChooser(webView, filePathCallback, fileChooserParams)
+    private fun chooseFile() {
+        val pickImage = Intent(Intent.ACTION_PICK)
+        pickImage.type = "image/*"
+        startActivityForResult(pickImage,SELECT_PHOTO)
+        Log.d("FILE","You choose file")
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if(requestCode == SELECT_PHOTO && resultCode == RESULT_OK && data != null && data.data != null){
+            val uri = data.data!!
+            try {
+                val bitmap: Bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    val imageDecoder = ImageDecoder.createSource(contentResolver,uri)
+                    ImageDecoder.decodeBitmap(imageDecoder)
+                } else {
+                    MediaStore.Images.Media.getBitmap(contentResolver,uri)
+                }
+                imageView.setImageBitmap(bitmap)
+            } catch (e: Exception){
+                e.printStackTrace()
+            }
         }
-    }
-
-    override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
-        super.onSaveInstanceState(outState, outPersistentState)
-        webView.saveState(outState)
-    }
-
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-        webView.restoreState(savedInstanceState)
     }
 }
