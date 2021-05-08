@@ -9,6 +9,7 @@ import android.provider.MediaStore
 import android.util.Log
 import android.widget.Button
 import android.widget.ImageView
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
@@ -28,28 +29,23 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private val activityLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()){uri ->
+        try {
+            val bitmap: Bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                val imageDecoder = ImageDecoder.createSource(contentResolver,uri)
+                ImageDecoder.decodeBitmap(imageDecoder)
+            } else {
+                MediaStore.Images.Media.getBitmap(contentResolver,uri)
+            }
+            imageView.setImageBitmap(bitmap)
+        } catch (e: Exception){
+            e.printStackTrace()
+        }
+    }
+
     private fun chooseFile() {
-        val pickImage = Intent(Intent.ACTION_PICK)
-        pickImage.type = "image/*"
-        startActivityForResult(pickImage,SELECT_PHOTO)
+        activityLauncher.launch(arrayOf("image/*"))
         Log.d("FILE","You choose file")
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if(requestCode == SELECT_PHOTO && resultCode == RESULT_OK && data != null && data.data != null){
-            val uri = data.data!!
-            try {
-                val bitmap: Bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                    val imageDecoder = ImageDecoder.createSource(contentResolver,uri)
-                    ImageDecoder.decodeBitmap(imageDecoder)
-                } else {
-                    MediaStore.Images.Media.getBitmap(contentResolver,uri)
-                }
-                imageView.setImageBitmap(bitmap)
-            } catch (e: Exception){
-                e.printStackTrace()
-            }
-        }
-    }
 }
