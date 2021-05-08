@@ -7,11 +7,12 @@ import android.webkit.PermissionRequest
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebView
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 
-class WebWithLoadFilesFragment : WebFragment(R.layout.fragment_web_with_load_files){
+class WebWithLoadFilesFragment : WebFragment(R.layout.fragment_web_with_load_files) {
 
-    companion object{
+    companion object {
         val TAG: String = WebWithLoadFilesFragment::class.java.name
     }
 
@@ -26,27 +27,35 @@ class WebWithLoadFilesFragment : WebFragment(R.layout.fragment_web_with_load_fil
         webView.webChromeClient = webChromeClient
     }
 
-    private val webChromeClient = object : WebChromeClient(){
+    private val webChromeClient = object : WebChromeClient() {
         override fun onPermissionRequest(request: PermissionRequest?) {
             super.onPermissionRequest(request)
-            Log.d(TAG,"Required permissions")
+            Log.d(TAG, "Required permissions")
         }
+
+        private lateinit var filePathCallback: ValueCallback<Array<Uri>>
+
+        private var launcher: ActivityResultLauncher<Array<String>> =
+            registerForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { result ->
+                Log.d(TAG, "Result : ${result.size}")
+                filePathCallback.onReceiveValue(result.toTypedArray())
+            }
 
         override fun onShowFileChooser(
             webView: WebView?,
             filePathCallback: ValueCallback<Array<Uri>>?,
             fileChooserParams: FileChooserParams?
         ): Boolean {
-            filePathCallback?.onReceiveValue(null)
+            filePathCallback?.let { this.filePathCallback = it }
 
-            Log.d(TAG,"Params: $fileChooserParams")
+            Log.d(TAG, "Params: $fileChooserParams")
 
-            registerForActivityResult(ActivityResultContracts.OpenMultipleDocuments()){result ->
-                filePathCallback?.onReceiveValue(result.toTypedArray())
-            }.launch(arrayOf("*/*"))
+            launcher.launch(arrayOf("image/*"))
 
-            return super.onShowFileChooser(webView, filePathCallback, fileChooserParams)
+            return true
         }
+
+
     }
 }
 
