@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "19917495190",
+    "project_id": "webviewtest-3f5a0",
+    "storage_bucket": "webviewtest-3f5a0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:19917495190:android:31414513b7269a6a855bb7",
+        "android_client_info": {
+          "package_name": "ua.zloydi.webviewtest"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "19917495190-ak7ivrenln0j50sue6odn1p00eg60526.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBS4zierNr75gn54TKEMIVdl7Vqs637spE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "19917495190-ak7ivrenln0j50sue6odn1p00eg60526.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

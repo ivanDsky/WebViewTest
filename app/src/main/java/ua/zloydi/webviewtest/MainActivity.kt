@@ -2,6 +2,8 @@ package ua.zloydi.webviewtest
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 
 
 class MainActivity : AppCompatActivity() {
@@ -14,10 +16,22 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupView(){
-        supportFragmentManager.beginTransaction().apply {
-            add(R.id.fragmentView,WebWithLoadFilesFragment())
-            commit()
+        val config = FirebaseRemoteConfig.getInstance()
+        val configSettings = FirebaseRemoteConfigSettings.Builder()
+            .setMinimumFetchIntervalInSeconds(5)
+            .build()
+        config.setConfigSettingsAsync(configSettings)
+        config.fetchAndActivate().addOnCompleteListener {
+            supportFragmentManager.beginTransaction().apply {
+                if(config.getBoolean("IsLogin")) {
+                    add(R.id.fragmentView, WebWithLoginFragment())
+                }else {
+                    add(R.id.fragmentView, WebWithLoadFilesFragment())
+                }
+                commit()
+            }
         }
+
     }
 
 

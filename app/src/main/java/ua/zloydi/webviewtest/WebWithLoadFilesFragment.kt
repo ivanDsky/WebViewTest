@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.os.Environment
 import android.util.Log
 import android.webkit.*
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 
 class WebWithLoadFilesFragment : WebFragment(R.layout.fragment_web_with_load_files) {
@@ -25,7 +24,8 @@ class WebWithLoadFilesFragment : WebFragment(R.layout.fragment_web_with_load_fil
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        webView.loadUrl("https://jpg2pdf.com/")
+
+
         webView.settings.apply {
             domStorageEnabled = true
             allowContentAccess = true
@@ -54,6 +54,7 @@ class WebWithLoadFilesFragment : WebFragment(R.layout.fragment_web_with_load_fil
 
         }
         webView.webChromeClient = webChromeClient
+        webView.loadUrl("https://jpg2pdf.com/")
     }
 
     private val webChromeClient = object : WebChromeClient() {
